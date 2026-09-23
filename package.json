@@ -24,7 +24,6 @@
     "typeorm": "^0.3.25"
   },
   "devDependencies": {
-    "@types/hapi__hapi": "^21.0.14",
     "@types/node": "^22.15.21",
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
