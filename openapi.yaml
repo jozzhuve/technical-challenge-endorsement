@@ -1,0 +1,186 @@
+openapi: 3.0.3
+info:
+  title: Endorsement Translator API
+  version: 1.0.0
+  description: Traduce un endoso plano al contrato estructurado esperado por el core usando plantillas dinámicas.
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/v1/endorsements/translate:
+    post:
+      summary: Traduce un endoso usando la plantilla activa
+      operationId: translateEndorsement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EndorsementInput'
+      responses:
+        '200':
+          description: Endoso traducido correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslatedEndorsement'
+        '400':
+          description: Solicitud inválida o campo requerido por la plantilla ausente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No existe una plantilla activa para producto y tipo de endoso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /endorse/translate:
+    post:
+      summary: Ruta de compatibilidad solicitada por el reto
+      operationId: translateEndorsementLegacyPath
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EndorsementInput'
+      responses:
+        '200':
+          description: Endoso traducido correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslatedEndorsement'
+  /health:
+    get:
+      summary: Verifica disponibilidad del servicio
+      responses:
+        '200':
+          description: Servicio disponible
+components:
+  schemas:
+    EndorsementInput:
+      type: object
+      additionalProperties: true
+      required:
+        - policyNumber
+        - idEnvio
+        - frecuencia
+        - tipoEndoso
+        - producto
+        - plan
+        - moneda
+        - usuario
+        - fechaSolicitud
+        - fechaCliente
+        - fechaEfectiva
+      properties:
+        policyNumber:
+          type: string
+          example: '08200000049'
+        idEnvio:
+          type: integer
+          example: 5984
+        frecuencia:
+          type: string
+          example: Semestral
+        tipoEndoso:
+          type: string
+          example: CambioFrecuencia
+        producto:
+          type: string
+          example: Rumbo
+        plan:
+          type: string
+          example: PlanRumbo
+        moneda:
+          type: string
+          example: Nuevo Sol
+        usuario:
+          type: string
+          example: interface.servicios
+        fechaSolicitud:
+          type: string
+          format: date
+        fechaCliente:
+          type: string
+          format: date
+        fechaEfectiva:
+          type: string
+          format: date
+    DynamicDataItem:
+      type: object
+      required: [etiqueta, value]
+      properties:
+        etiqueta:
+          type: string
+        value:
+          type: string
+    AppliedEvent:
+      type: object
+      required: [description, orderEvent]
+      properties:
+        description:
+          type: string
+        orderEvent:
+          type: integer
+    TranslatedEndorsement:
+      type: object
+      required:
+        - policyNumber
+        - idEnvio
+        - financialPlansEntity
+        - currency
+        - productEntity
+        - eventEntity
+        - eventAppliedEntities
+        - riskUnitEntities
+      properties:
+        policyNumber:
+          type: string
+        idEnvio:
+          type: integer
+        financialPlansEntity:
+          type: object
+          properties:
+            description:
+              type: string
+        currency:
+          type: object
+          properties:
+            description:
+              type: string
+        productEntity:
+          type: object
+          properties:
+            description:
+              type: string
+        eventEntity:
+          type: object
+          properties:
+            description:
+              type: string
+            dynamicData:
+              type: array
+              items:
+                $ref: '#/components/schemas/DynamicDataItem'
+        eventAppliedEntities:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppliedEvent'
+        riskUnitEntities:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+    ErrorResponse:
+      type: object
+      required: [code, message, traceId]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        traceId:
+          type: string
