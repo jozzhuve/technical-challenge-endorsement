@@ -14,8 +14,14 @@ module.exports = {
   },
   ignorePatterns: ['dist/', 'coverage/', 'node_modules/'],
   rules: {
-    '@typescript-eslint/explicit-function-return-type': 'error',
+    '@typescript-eslint/explicit-function-return-type': [
+      'error',
+      {
+        allowExpressions: true,
+        allowConciseArrowFunctionExpressionsStartingWithVoid: true
+      }
+    ],
     '@typescript-eslint/no-explicit-any': 'error',
-    '@typescript-eslint/no-unused-vars': ['error', { 'argsIgnorePattern': '^_' }]
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }]
   }
 };
